@@ -95,6 +95,10 @@ int main()
    	   {
          robot.turnLeft(_left_motor, _right_motor);
 
+         if(rightCounter == 1) leftCounter = 3;
+         if(rightCounter == 2) leftCounter = 2;
+         if(rightCounter == 3) leftCounter = 1;
+
          leftCounter++;
  
          if(leftCounter > 3) leftCounter = 0;
@@ -128,6 +132,8 @@ int main()
          robot.turnRight(_left_motor,_right_motor);
 
          if(leftCounter == 1) rightCounter = 3;
+         if(leftCounter == 2) rightCounter = 2;
+         if(leftCounter == 3) rightCounter = 1;
 
          rightCounter++;
 
@@ -155,7 +161,12 @@ int main()
            }
       
            field[i][j] = -1;
+           checkSensors(leftSensor,rightSensor,forwardSensor,i,j);
          }
+
+   	   } 
+   	   else if(bMoveBack)
+   	   {
 
    	   } else break;
 
