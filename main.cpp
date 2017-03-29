@@ -1,24 +1,26 @@
 #include "CRobot.h"
 
-#define MAX_LENGTH 16
+#include <cstdlib>
+
+#define MAX_LENGTH 12
 
 int field[9][9] = 
 {
  {1, 1, 1, 1, 1, 1, 1, 1, 1},
  {1, 0, 0, 0, 0, 0, 0, 0, 1},
  {1, 0, 0, 0, 0, 0, 0, 0, 1},
+ {1, 0, 1, 0, 1, 0, 0, 0, 1},
  {1, 0, 0, 0, 0, 0, 0, 0, 1},
- {1, 0, 0, 0, 0, 0, 0, 0, 1},
- {1, 0, 0, 0, 0, 0, 0, 0, 1},
- {1, 0, 0, 0, 0, 0, 0, 0, 1},
- {1, 0, 0, 0, 0, 0, 0, 0, 1},
+ {1, 0, 0, 0, 1, 0, 0, 0, 1},
+ {1, 0, 0, 1, 0, 0, 0, 0, 1},
+ {1, 0, 1, 0, 0, 0, 0, 0, 1},
  {1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
 
-bool checkForward(int x, int y);
-bool checkBack(int x, int y);
-bool checkLeft(int x, int y);
-bool checkRight(int x, int y);
+inline bool checkForward(int x, int y);
+inline bool checkBack(int x, int y);
+inline bool checkLeft(int x, int y);
+inline bool checkRight(int x, int y);
 
 void checkMovement(int x, int y);
 
@@ -43,14 +45,11 @@ int main()
    ev3dev::ultrasonic_sensor rightSensor("in3:i2c1");
    ev3dev::ultrasonic_sensor forwardSensor(ev3dev::INPUT_1);
 
-   _left_motor.reset();
-   _right_motor.reset();
-
    CRobot robot;
 
    int i = 1, j = 1;
   
-   field[i][j] = -1;
+   field[i][j] = 2;
 
    try
    {
@@ -59,41 +58,43 @@ int main()
        checkSensors(leftSensor, rightSensor, forwardSensor, i, j);
    	   checkMovement(i, j);
 
+   	   if(i == 7 && j == 7) break;
+
    	   if(bMoveForward)
    	   {
         if(leftCounter == 1) 
         {
-          robot.turnRight(_left_motor,_right_motor);
+        //  robot.turnRight(_left_motor,_right_motor);
           leftCounter = 0;
         }
 
         if(leftCounter == 3)
         {
-        	robot.turnLeft(_left_motor,_right_motor);
+        //	robot.turnLeft(_left_motor,_right_motor);
         	leftCounter = 0;
         }
 
         if(rightCounter == 1)
         {
-        	robot.turnLeft(_left_motor,_right_motor);
+        //	robot.turnLeft(_left_motor,_right_motor);
         	rightCounter = 0;
         }
 
         if(rightCounter == 3)
         {
-          robot.turnRight(_left_motor,_right_motor);
+         // robot.turnRight(_left_motor,_right_motor);
           rightCounter = 0;
         }
 
-   	   	robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
+   	   	//robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
 
    	   	i += 2;
 
-   	   	field[i][j] = -1;
+   	   	field[i][j] = 2;
    	   } 
    	   else if(bMoveLeft)
    	   {
-         robot.turnLeft(_left_motor, _right_motor);
+        // robot.turnLeft(_left_motor, _right_motor);
 
          if(rightCounter == 1) leftCounter = 3;
          if(rightCounter == 2) leftCounter = 2;
@@ -105,7 +106,7 @@ int main()
           
          while(checkLeft(i, j))
          {
-           robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
+           //robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
 
            if(leftCounter == 0)
            {
@@ -123,13 +124,13 @@ int main()
            {
            	 j -= 2;
            }
-           field[i][j] = -1;
+           field[i][j] = 2;
            checkSensors(leftSensor,rightSensor,forwardSensor,i,j);
          }
    	   } 
    	   else if(bMoveRight)
    	   {
-         robot.turnRight(_left_motor,_right_motor);
+         //robot.turnRight(_left_motor,_right_motor);
 
          if(leftCounter == 1) rightCounter = 3;
          if(leftCounter == 2) rightCounter = 2;
@@ -140,8 +141,8 @@ int main()
          if(rightCounter > 3) rightCounter = 0;
           
         while(checkRight(i, j))
-         {
-           robot.runForward(_left_motor, _right_motor, 500, 360);
+        {
+           //robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
 
            if(rightCounter == 0)
            {
@@ -160,13 +161,44 @@ int main()
            	 j += 2;
            }
       
-           field[i][j] = -1;
+           field[i][j] = 2;
            checkSensors(leftSensor,rightSensor,forwardSensor,i,j);
          }
 
    	   } 
    	   else if(bMoveBack)
    	   {
+        if(leftCounter == 1) 
+        {
+         // robot.turnRight(_left_motor,_right_motor);
+          leftCounter = 0;
+        }
+
+        if(leftCounter == 3)
+        {
+        //	robot.turnLeft(_left_motor,_right_motor);
+        	leftCounter = 0;
+        }
+
+        if(rightCounter == 1)
+        {
+        //	robot.turnLeft(_left_motor,_right_motor);
+        	rightCounter = 0;
+        }
+
+        if(rightCounter == 3)
+        {
+         // robot.turnRight(_left_motor,_right_motor);
+          rightCounter = 0;
+        }
+
+   	   	//robot.runBack(_left_motor, _right_motor, 500, 360 * 2);
+
+   	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j)) field[i - 1][j] = 1;
+
+   	    i -= 2;
+ 
+        field[i][j] = 2;
 
    	   } else break;
 
@@ -198,7 +230,7 @@ void checkMovement(int x, int y)
         minLength = length;
 
         bMoveForward = true;
-      }
+       }
 	}
 
 	if(checkBack(x, y))
@@ -272,6 +304,8 @@ void checkSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
       else if(leftCounter == 3) field[x - 1][y] = 1;
     }
 
+    system("clear");
+
 	for(int i = 0; i < 9; i++)
 	{
 		for(int j = 0; j < 9; j++)
@@ -281,32 +315,34 @@ void checkSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
+
+	std::cout << x << " " << y << std::endl;
 }
 
-bool checkForward(int x, int y)
+inline bool checkForward(int x, int y)
 {
 	return field[x + 1][y] != 1;
 }
 
-bool checkBack(int x, int y)
+inline bool checkBack(int x, int y)
 {
 	return field[x - 1][y] != 1;
 }
 
-bool checkLeft(int x, int y)
+inline bool checkLeft(int x, int y)
 {
 	return field[x][y + 1] != 1;
 }
 
-bool checkRight(int x, int y)
+inline bool checkRight(int x, int y)
 {
 	return field[x][y - 1] != 1;
 }
 
 int getLength(int x, int y)
 {
-  static int finishX = 8;
-  static int finishY = 8;
+  static int finishX = 7;
+  static int finishY = 7;
 
   return abs(finishX - x) + abs(finishY - y);
 }
