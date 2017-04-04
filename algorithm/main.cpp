@@ -18,10 +18,10 @@ int field[9][9] =
  {2, 2, 2, 2, 2, 2, 2, 2, 2}
 };
 
-inline bool checkForward(int x, int y);
-inline bool checkBack(int x, int y);
-inline bool checkLeft(int x, int y);
-inline bool checkRight(int x, int y);
+bool checkForward(int x, int y);
+bool checkBack(int x, int y);
+bool checkLeft(int x, int y);
+bool checkRight(int x, int y);
 
 void checkMovement(int x, int y);
 
@@ -39,8 +39,6 @@ int main()
 {  
    int i = 1, j = 1;
   
-   field[i][j] = 1;
-
    try
    {
      while(true)
@@ -65,31 +63,27 @@ int main()
 
    	   if(bMoveForward)
    	   {
-   	   	i += 2;
+          field[i + 1][j] = 1;
 
-   	   	field[i][j] = 1;
+   	   	  i += 2;
    	   } 
    	   else if(bMoveLeft)
    	   {
+   	   	   field[i][j + 1] = 1;
            j += 2; 
-
-           field[i][j] = 1;
    	   } 
    	   else if(bMoveRight)
    	   {
+   	   	   field[i][j - 1] = 1;
            j -= 2;
-      
-           field[i][j] = 1;
-
    	   } 
    	   else if(bMoveBack)
    	   {
+   	   	field[i - 1][j] = 1;
        
    	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j)) field[i - 1][j] = 2;
 
    	    i -= 2;
- 
-        field[i][j] = 1;
 
    	   } else break;
 
@@ -171,23 +165,30 @@ void checkMovement(int x, int y)
 	minLength = MAX_LENGTH;
 }
 
-inline bool checkForward(int x, int y)
+bool checkForward(int x, int y)
 {
+    if(field[x + 1][y] > field[x - 1][y]) return false; 
+
 	return field[x + 1][y] != 2;
 }
 
-inline bool checkBack(int x, int y)
+bool checkBack(int x, int y)
 {
+	if(field[x - 1][y] > field[x + 1][y]) return false; 
+
 	return field[x - 1][y] != 2;
 }
 
-inline bool checkLeft(int x, int y)
+bool checkLeft(int x, int y)
 {
+	if(field[x][y + 1] > field[x][y - 1]) return false; 
+
 	return field[x][y + 1] != 2;
 }
-
-inline bool checkRight(int x, int y)
+bool checkRight(int x, int y)
 {
+	if(field[x][y - 1] > field[x][y + 1]) return false; 
+
 	return field[x][y - 1] != 2;
 }
 
