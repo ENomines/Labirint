@@ -10,10 +10,10 @@ int field[9][9] =
  {2, 2, 2, 2, 2, 2, 2, 2, 2},
  {2, 0, 0, 0, 0, 0, 2, 0, 2},
  {2, 2, 2, 0, 2, 2, 2, 0, 2},
- {2, 0, 2, 0, 2, 0, 0, 0, 2},
- {2, 0, 2, 0, 2, 2, 0, 0, 2},
  {2, 0, 2, 0, 0, 0, 0, 0, 2},
- {2, 0, 2, 0, 2, 0, 0, 0, 2},
+ {2, 0, 2, 0, 2, 2, 0, 0, 2},
+ {2, 0, 2, 0, 0, 0, 2, 0, 2},
+ {2, 0, 2, 0, 2, 2, 0, 0, 2},
  {2, 0, 2, 0, 2, 0, 0, 0, 2},
  {2, 2, 2, 2, 2, 2, 2, 2, 2}
 };
@@ -65,7 +65,7 @@ int main()
    	   {
           field[i + 1][j] = 1;
 
-          if(!checkLeft(i,j) && !checkRight(i,j) && !checkBack(i,j)) field[i + 1][j] = 2;
+          if(!checkLeft(i,j) && !checkRight(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i + 1][j] = 2;
 
    	   	  i += 2;
    	   } 
@@ -73,7 +73,7 @@ int main()
    	   {
    	   	   field[i][j + 1] = 1;
 
-           if(!checkRight(i,j) && !checkForward(i,j) && !checkBack(i,j)) field[i][j + 1] = 2;
+           if(!checkRight(i,j) && !checkForward(i,j) && !checkBack(i,j)&& i != 1 && j != 1) field[i][j + 1] = 2;
 
            j += 2; 
    	   } 
@@ -81,7 +81,7 @@ int main()
    	   {
    	   	   field[i][j - 1] = 1;
 
-           if(!checkLeft(i,j) && !checkForward(i,j) && !checkBack(i,j)) field[i][j - 1] = 2;
+           if(!checkLeft(i,j) && !checkForward(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i][j - 1] = 2;
 
            j -= 2;
    	   } 
@@ -89,7 +89,7 @@ int main()
    	   {
    	   	field[i - 1][j] = 1;
        
-   	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j)) field[i - 1][j] = 2;
+   	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j) && i != 1 && j != 1) field[i - 1][j] = 2;
 
    	    i -= 2;
 
