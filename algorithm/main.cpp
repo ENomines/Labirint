@@ -9,23 +9,25 @@ int field[9][9] =
 {
  {2, 2, 2, 2, 2, 2, 2, 2, 2},
  {2, 0, 0, 0, 0, 0, 2, 0, 2},
- {2, 2, 2, 0, 2, 2, 2, 0, 2},
- {2, 0, 2, 0, 0, 0, 0, 0, 2},
- {2, 0, 2, 0, 2, 2, 0, 0, 2},
- {2, 0, 2, 0, 0, 0, 2, 0, 2},
- {2, 0, 2, 0, 2, 2, 0, 0, 2},
- {2, 0, 2, 0, 2, 0, 0, 0, 2},
+ {2, 2, 0, 0, 0, 0, 2, 0, 2},
+ {2, 0, 0, 0, 0, 0, 2, 0, 2},
+ {2, 0, 0, 0, 2, 0, 2, 0, 2},
+ {2, 0, 0, 0, 0, 0, 2, 0, 2},
+ {2, 2, 2, 2, 2, 0, 2, 0, 2},
+ {2, 0, 0, 0, 0, 0, 0, 0, 2},
  {2, 2, 2, 2, 2, 2, 2, 2, 2}
 };
 
-bool checkForward(int x, int y);
-bool checkBack(int x, int y);
-bool checkLeft(int x, int y);
-bool checkRight(int x, int y);
+bool CheckForward(int x, int y);
+bool CheckBack(int x, int y);
+bool CheckLeft(int x, int y);
+bool CheckRight(int x, int y);
 
-void checkMovement(int x, int y);
+void CheckMovement(int x, int y);
 
-int getLength(int x, int y);
+int GetLength(int x, int y);
+
+void GoHome(int x, int y);
 
 bool bMoveForward = false;
 bool bMoveBack = false;
@@ -33,6 +35,7 @@ bool bMoveLeft = false;
 bool bMoveRight = false;
 
 int minLength = MAX_LENGTH;
+int minRating = 2;
 int leftCounter = 0, rightCounter = 0;
 
 int main() 
@@ -55,17 +58,17 @@ int main()
        }
        std::cout << std::endl;
 
-       std::cout << i << " " << j << std::endl;  
+       std::cout << i << " " << j << " " << minRating << std::endl;  
 
-   	   checkMovement(i, j);
+       if(i == 7 && j == 7) break;
 
-   	   if(i == 7 && j == 7) break;
+   	   CheckMovement(i, j);
 
    	   if(bMoveForward)
    	   {
           field[i + 1][j] = 1;
 
-          if(!checkLeft(i,j) && !checkRight(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i + 1][j] = 2;
+          if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && i != 1 && j != 1) field[i + 1][j] = 2;
 
    	   	  i += 2;
    	   } 
@@ -73,7 +76,7 @@ int main()
    	   {
    	   	   field[i][j + 1] = 1;
 
-           if(!checkRight(i,j) && !checkForward(i,j) && !checkBack(i,j)&& i != 1 && j != 1) field[i][j + 1] = 2;
+           if(!CheckRight(i,j) && !CheckForward(i,j) && !CheckBack(i,j)&& i != 1 && j != 1) field[i][j + 1] = 2;
 
            j += 2; 
    	   } 
@@ -81,7 +84,7 @@ int main()
    	   {
    	   	   field[i][j - 1] = 1;
 
-           if(!checkLeft(i,j) && !checkForward(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i][j - 1] = 2;
+           if(!CheckLeft(i,j) && !CheckForward(i,j) && !CheckBack(i,j) && i != 1 && j != 1) field[i][j - 1] = 2;
 
            j -= 2;
    	   } 
@@ -89,7 +92,7 @@ int main()
    	   {
    	   	field[i - 1][j] = 1;
        
-   	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j) && i != 1 && j != 1) field[i - 1][j] = 2;
+   	   	if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && i != 1 && j != 1) field[i - 1][j] = 2;
 
    	    i -= 2;
 
@@ -109,45 +112,87 @@ int main()
      exit(0);
    }
 
+   GoHome(i, j);
+
    return 0;
 }
 
-void checkMovement(int x, int y)
+void CheckMovement(int x, int y)
 {
     static int length = 0;
+    static int rating = 0;
 
-	if(checkForward(x, y))
+	if(CheckForward(x, y))
 	{
-      length = getLength(x + 1, y);
+      rating = field[x + 1][y];
+         
+      if(rating == minRating)
+      {
+        length = GetLength(x + 1, y);
 
-      if(length < minLength) 
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = true;
+        }
+      } else if(rating < minRating)
       {
         minLength = length;
+        minRating = rating;
 
         bMoveForward = true;
-       }
+      }
 	}
 
-	if(checkBack(x, y))
+	if(CheckBack(x, y))
 	{
-      length = getLength(x - 1, y);
+      rating = field[x - 1][y];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
-        minLength = length;
+        length = GetLength(x - 1, y);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = true;
+        }
+      } else if(rating < minRating)
+      {
+      	minLength = length;
+      	minRating = rating;
 
         bMoveForward = false;
         bMoveBack = true;
       }
 	}
 
-	if(checkLeft(x, y))
+	if(CheckLeft(x, y))
 	{
-      length = getLength(x, y + 1);
+      rating = field[x][y + 1];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
-        minLength = length;
+        length = GetLength(x, y + 1);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = false;
+          bMoveLeft = true;
+        }
+      } else if(rating < minRating)
+      {
+      	minLength = length;
+      	minRating = rating;
 
         bMoveForward = false;
         bMoveBack = false;
@@ -155,13 +200,28 @@ void checkMovement(int x, int y)
       }
 	}
 
-	if(checkRight(x, y))
+	if(CheckRight(x, y))
 	{
-      length = getLength(x, y - 1);
+	  rating = field[x][y - 1];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
-        minLength = length;
+        length = GetLength(x, y - 1);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = false;
+          bMoveLeft = false;
+          bMoveRight = true;
+        }
+      } else if(rating < minRating)
+      {
+      	minLength = length;
+      	minRating = rating;
 
         bMoveForward = false;
         bMoveBack = false;
@@ -171,41 +231,83 @@ void checkMovement(int x, int y)
 	}
 
 	minLength = MAX_LENGTH;
+	minRating = 2;
 }
 
-bool checkForward(int x, int y)
+bool CheckForward(int x, int y)
 {
-    if(field[x + 1][y] > field[x - 1][y]) return false; 
-
 	return field[x + 1][y] != 2;
 }
 
-bool checkBack(int x, int y)
+bool CheckBack(int x, int y)
 {
-	if(field[x - 1][y] > field[x + 1][y]) return false; 
-
 	return field[x - 1][y] != 2;
 }
 
-bool checkLeft(int x, int y)
+bool CheckLeft(int x, int y)
 {
-	if(field[x][y + 1] > field[x][y - 1]) return false; 
-
 	return field[x][y + 1] != 2;
 }
-bool checkRight(int x, int y)
+bool CheckRight(int x, int y)
 {
-	if(field[x][y - 1] > field[x][y + 1]) return false; 
-
 	return field[x][y - 1] != 2;
 }
 
-int getLength(int x, int y)
+int GetLength(int x, int y)
 {
   static int finishX = 7;
   static int finishY = 7;
 
   return abs(finishX - x) + abs(finishY - y);
+}
+
+void GoHome(int x, int y)
+{
+	while(true)
+	{
+      system("clear");
+
+       for(int i = 0; i < 9; i++)
+       {
+         for(int j = 0; j < 9; j++)
+         {
+           std::cout << field[i][j] << " ";
+         }
+         std::cout << std::endl;
+       }
+      std::cout << std::endl;
+
+      std::cout << x << " " << y << std::endl;  
+
+      if(x == 1 && y == 1) break;
+
+      if(field[x + 1][y] == 1)
+      {
+        x += 2;
+
+        field[x - 1][y] == 2;
+      }
+      else if(field[x - 1][y] == 1) 
+      {
+      	x -= 2;
+
+        field[x + 1][y] = 2;
+      }
+      else if(field[x][y + 1] == 1) 
+      {
+      	y += 2;
+
+      	field[x][y - 1] = 2;
+      }
+      else if(field[x][y - 1] == 1) 
+      {
+      	y -= 2;
+
+      	field[x][y + 1] = 2;
+      }
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
 }
 
 
