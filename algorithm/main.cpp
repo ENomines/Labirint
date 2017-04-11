@@ -3,19 +3,19 @@
 #include <chrono>
 #include <thread>
 
-#define MAX_LENGTH 12
+#define MAX_LENGTH 14
 
-int field[9][9] = 
+int field[9][17] = 
 {
- {2, 2, 2, 2, 2, 2, 2, 2, 2},
- {2, 0, 0, 0, 0, 0, 2, 0, 2},
- {2, 2, 0, 0, 0, 0, 2, 0, 2},
- {2, 0, 0, 0, 0, 0, 2, 0, 2},
- {2, 0, 0, 0, 2, 0, 2, 0, 2},
- {2, 0, 0, 0, 0, 0, 2, 0, 2},
- {2, 2, 2, 2, 2, 0, 2, 0, 2},
- {2, 0, 0, 0, 0, 0, 0, 0, 2},
- {2, 2, 2, 2, 2, 2, 2, 2, 2}
+ {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+ {2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 4, 2},
+ {2, 0, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 0, 2},
+ {2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+ {2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 2, 0, 2, 0, 2, 0, 2},
+ {2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 2, 0, 2, 0, 2},
+ {2, 0, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2, 2, 0, 2, 0, 2},
+ {2, 3, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2},
+ {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 };
 
 bool CheckForward(int x, int y);
@@ -40,7 +40,7 @@ int leftCounter = 0, rightCounter = 0;
 
 int main() 
 {  
-   int i = 1, j = 1;
+   int i = 7, j = 1;
   
    try
    {
@@ -50,7 +50,7 @@ int main()
 
        for(int x = 0; x < 9; x++)
        {
-         for(int y = 0; y < 9; y++)
+         for(int y = 0; y < 17; y++)
          {
            std::cout << field[x][y] << " ";
          }
@@ -58,9 +58,9 @@ int main()
        }
        std::cout << std::endl;
 
-       std::cout << i << " " << j << " " << minRating << std::endl;  
+       std::cout << i << " " << j << std::endl;  
 
-       if(i == 7 && j == 7) break;
+       if(field[i][j] == 4) break;
 
    	   CheckMovement(i, j);
 
@@ -68,7 +68,7 @@ int main()
    	   {
           field[i + 1][j] = 1;
 
-          if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && i != 1 && j != 1) field[i + 1][j] = 2;
+   	   	  if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && field[i][j] != 3) field[i + 1][j] = 2;
 
    	   	  i += 2;
    	   } 
@@ -76,7 +76,7 @@ int main()
    	   {
    	   	   field[i][j + 1] = 1;
 
-           if(!CheckRight(i,j) && !CheckForward(i,j) && !CheckBack(i,j)&& i != 1 && j != 1) field[i][j + 1] = 2;
+   	   	   if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckRight(i,j) && field[i][j] != 3) field[i][j + 1] = 2;
 
            j += 2; 
    	   } 
@@ -84,15 +84,15 @@ int main()
    	   {
    	   	   field[i][j - 1] = 1;
 
-           if(!CheckLeft(i,j) && !CheckForward(i,j) && !CheckBack(i,j) && i != 1 && j != 1) field[i][j - 1] = 2;
+   	   	   if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckLeft(i,j) && field[i][j] != 3) field[i][j - 1] = 2;
 
            j -= 2;
    	   } 
    	   else if(bMoveBack)
    	   {
    	   	field[i - 1][j] = 1;
-       
-   	   	if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && i != 1 && j != 1) field[i - 1][j] = 2;
+
+        if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && field[i][j] != 3) field[i - 1][j] = 2;
 
    	    i -= 2;
 
@@ -139,6 +139,8 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
+        length = GetLength(x + 1, y);
+
         minLength = length;
         minRating = rating;
 
@@ -164,6 +166,8 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
+        length = GetLength(x - 1, y);
+
       	minLength = length;
       	minRating = rating;
 
@@ -191,6 +195,8 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
+        length = GetLength(x, y + 1);
+
       	minLength = length;
       	minRating = rating;
 
@@ -220,6 +226,8 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
+        length = GetLength(x, y - 1);
+
       	minLength = length;
       	minRating = rating;
 
@@ -255,8 +263,8 @@ bool CheckRight(int x, int y)
 
 int GetLength(int x, int y)
 {
-  static int finishX = 7;
-  static int finishY = 7;
+  static int finishX = 1;
+  static int finishY = 15;
 
   return abs(finishX - x) + abs(finishY - y);
 }
@@ -269,7 +277,7 @@ void GoHome(int x, int y)
 
        for(int i = 0; i < 9; i++)
        {
-         for(int j = 0; j < 9; j++)
+         for(int j = 0; j < 17; j++)
          {
            std::cout << field[i][j] << " ";
          }
@@ -279,13 +287,13 @@ void GoHome(int x, int y)
 
       std::cout << x << " " << y << std::endl;  
 
-      if(x == 1 && y == 1) break;
+      if(field[x][y] == 3) break;
 
       if(field[x + 1][y] == 1)
       {
         x += 2;
 
-        field[x - 1][y] == 2;
+        field[x - 1][y] = 2;
       }
       else if(field[x - 1][y] == 1) 
       {

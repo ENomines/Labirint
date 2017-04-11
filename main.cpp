@@ -2,31 +2,32 @@
 
 #include <cstdlib>
 
-#define MAX_LENGTH 12
+#define MAX_LENGTH 14
 
-int field[9][9] = 
+int field[9][17] = 
 {
- {2, 2, 2, 2, 2, 2, 2, 2, 2},
- {2, 0, 0, 0, 2, 0, 0, 0, 2},
- {2, 2, 2, 0, 2, 0, 0, 0, 2},
- {2, 0, 2, 0, 0, 0, 0, 0, 2},
- {2, 0, 2, 0, 2, 2, 2, 2, 2},
- {2, 0, 2, 0, 0, 0, 0, 0, 2},
- {2, 0, 2, 2, 2, 2, 2, 0, 2},
- {2, 0, 0, 0, 2, 0, 0, 0, 2},
- {2, 2, 2, 2, 2, 2, 2, 2, 2}
+ {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+ {2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 2, 4, 2},
+ {2, 0, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 0, 2},
+ {2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2},
+ {2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 2, 0, 2, 0, 2, 0, 2},
+ {2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 2, 0, 2, 0, 2},
+ {2, 0, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2, 2, 0, 2, 0, 2},
+ {2, 3, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 2},
+ {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
 };
 
-inline bool checkForward(int x, int y);
-inline bool checkBack(int x, int y);
-inline bool checkLeft(int x, int y);
-inline bool checkRight(int x, int y);
+inline bool CheckForward(int x, int y);
+inline bool CheckBack(int x, int y);
+inline bool CheckLeft(int x, int y);
+inline bool CheckRight(int x, int y);
 
-void checkMovement(int x, int y);
+void CheckMovement(int x, int y);
+void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y);
 
-void checkSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y);
+int GetLength(int x, int y);
 
-int getLength(int x, int y);
+void GoHome(int x, int y);
 
 bool bMoveForward = false;
 bool bMoveBack = false;
@@ -34,6 +35,7 @@ bool bMoveLeft = false;
 bool bMoveRight = false;
 
 int minLength = MAX_LENGTH;
+int minRating = 2;
 int leftCounter = 0, rightCounter = 0;
 
 int main() 
@@ -47,30 +49,30 @@ int main()
 
    CRobot robot;
 
-   int i = 1, j = 1;
+   int i = 7, j = 1;
 
    try
    {
      while(true)
      {
        //checkSensors(leftSensor, rightSensor, forwardSensor, i, j);
-   	   checkMovement(i, j);
+   	   CheckMovement(i, j);
 
        system("clear");
 
        for(int i = 0; i < 9; i++)
        {
-         for(int j = 0; j < 9; j++)
+         for(int j = 0; j < 17; j++)
          {
            std::cout << field[i][j] << " ";
          }
          std::cout << std::endl;
        }
-      std::cout << std::endl;
+       std::cout << std::endl;
 
-      std::cout << i << " " << j << std::endl;
+       std::cout << i << " " << j << std::endl;
 
-   	   if(i == 7 && j == 7) break;
+   	   if(field[i][j] == 4) break;
 
    	   if(bMoveForward)
    	   {
@@ -102,7 +104,7 @@ int main()
 
         field[i + 1][j] = 1;
 
-        if(!checkLeft(i,j) && !checkRight(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i + 1][j] = 2;
+        if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && field[i][j] != 3) field[i + 1][j] = 2;
 
         i += 2;
    	   } 
@@ -118,13 +120,13 @@ int main()
  
          if(leftCounter > 3) leftCounter = 0;
           
-         while(checkLeft(i, j))
+         while(CheckLeft(i, j))
          {
            robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
 
            field[i][j + 1] = 1;
 
-           if(!checkRight(i,j) && !checkForward(i,j) && !checkBack(i,j)&& i != 1 && j != 1) field[i][j + 1] = 2;
+           if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckRight(i,j) && field[i][j] != 3) field[i][j + 1] = 2;
 
            if(leftCounter == 0)
            {
@@ -157,13 +159,13 @@ int main()
 
          if(rightCounter > 3) rightCounter = 0;
           
-        while(checkRight(i, j))
+        while(CheckRight(i, j))
         {
            robot.runForward(_left_motor, _right_motor, 500, 360 * 2);
 
            field[i][j - 1] = 1;
 
-           if(!checkLeft(i,j) && !checkForward(i,j) && !checkBack(i,j) && i != 1 && j != 1) field[i][j - 1] = 2;
+           if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckLeft(i,j) && field[i][j] != 3) field[i][j - 1] = 2;
 
            if(rightCounter == 0)
            {
@@ -214,7 +216,7 @@ int main()
 
         field[i - 1][j] = 1;
 
-   	   	if(!checkLeft(i,j) && !checkRight(i,j) && !checkForward(i,j)) field[i - 1][j] = 2;
+   	   if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && field[i][j] != 3) field[i - 1][j] = 2;
 
    	    i -= 2;
 
@@ -235,68 +237,132 @@ int main()
    return 0;
 }
 
-void checkMovement(int x, int y)
+void CheckMovement(int x, int y)
 {
     static int length = 0;
+    static int rating = 0;
 
-	if(checkForward(x, y))
-	{
-      length = getLength(x + 1, y);
-
-      if(length < minLength) 
+  if(CheckForward(x, y))
+  {
+      rating = field[x + 1][y];
+         
+      if(rating == minRating)
       {
+        length = GetLength(x + 1, y);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = true;
+        }
+      } else if(rating < minRating)
+      {
+        length = GetLength(x + 1, y);
+
         minLength = length;
+        minRating = rating;
 
         bMoveForward = true;
-       }
-	}
+      }
+  }
 
-	if(checkBack(x, y))
-	{
-      length = getLength(x - 1, y);
+  if(CheckBack(x, y))
+  {
+      rating = field[x - 1][y];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
+        length = GetLength(x - 1, y);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = true;
+        }
+      } else if(rating < minRating)
+      {
+        length = GetLength(x - 1, y);
+
         minLength = length;
+        minRating = rating;
 
         bMoveForward = false;
         bMoveBack = true;
       }
-	}
+  }
 
-	if(checkLeft(x, y))
-	{
-      length = getLength(x, y + 1);
+  if(CheckLeft(x, y))
+  {
+      rating = field[x][y + 1];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
+        length = GetLength(x, y + 1);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = false;
+          bMoveLeft = true;
+        }
+      } else if(rating < minRating)
+      {
+        length = GetLength(x, y + 1);
+
         minLength = length;
+        minRating = rating;
 
         bMoveForward = false;
         bMoveBack = false;
         bMoveLeft = true;
       }
-	}
+  }
 
-	if(checkRight(x, y))
-	{
-      length = getLength(x, y - 1);
+  if(CheckRight(x, y))
+  {
+    rating = field[x][y - 1];
 
-      if(length < minLength) 
+      if(rating == minRating)
       {
+        length = GetLength(x, y - 1);
+
+        if(length < minLength) 
+        {
+          minLength = length;
+          minRating = rating;
+
+          bMoveForward = false;
+          bMoveBack = false;
+          bMoveLeft = false;
+          bMoveRight = true;
+        }
+      } else if(rating < minRating)
+      {
+        length = GetLength(x, y - 1);
+
         minLength = length;
+        minRating = rating;
 
         bMoveForward = false;
         bMoveBack = false;
         bMoveLeft = false;
         bMoveRight = true;
       }
-	}
+  }
 
-	minLength = MAX_LENGTH;
+  minLength = MAX_LENGTH;
+  minRating = 2;
 }
 
-void checkSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y)
+void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y)
 {
     if(forwardSensor.distance_centimeters() <= 15)
     {
@@ -323,40 +389,80 @@ void checkSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
     }
 }
 
-inline bool checkForward(int x, int y)
+inline bool CheckForward(int x, int y)
 {
-  if(field[x + 1][y] > field[x - 1][y]) return false; 
-
-	return field[x + 1][y] != 2;
+  return field[x + 1][y] != 2;
 }
 
-inline bool checkBack(int x, int y)
+inline bool CheckBack(int x, int y)
 {
-  if(field[x - 1][y] > field[x + 1][y]) return false; 
-
-	return field[x - 1][y] != 2;
+  return field[x - 1][y] != 2;
 }
 
-inline bool checkLeft(int x, int y)
+inline bool CheckLeft(int x, int y)
 {
-  if(field[x][y + 1] > field[x][y - 1]) return false; 
-
-	return field[x][y + 1] != 2;
+  return field[x][y + 1] != 2;
+}
+inline bool CheckRight(int x, int y)
+{
+  return field[x][y - 1] != 2;
 }
 
-inline bool checkRight(int x, int y)
+int GetLength(int x, int y)
 {
-  if(field[x][y - 1] > field[x][y + 1]) return false; 
-
-	return field[x][y - 1] != 2;
-}
-
-int getLength(int x, int y)
-{
-  static int finishX = 7;
-  static int finishY = 7;
+  static int finishX = 1;
+  static int finishY = 15;
 
   return abs(finishX - x) + abs(finishY - y);
+}
+
+void GoHome(int x, int y)
+{
+  while(true)
+  {
+      system("clear");
+
+       for(int i = 0; i < 9; i++)
+       {
+         for(int j = 0; j < 17; j++)
+         {
+           std::cout << field[i][j] << " ";
+         }
+         std::cout << std::endl;
+       }
+      std::cout << std::endl;
+
+      std::cout << x << " " << y << std::endl;  
+
+      if(field[x][y] == 3) break;
+
+      if(field[x + 1][y] == 1)
+      {
+        x += 2;
+
+        field[x - 1][y] = 2;
+      }
+      else if(field[x - 1][y] == 1) 
+      {
+        x -= 2;
+
+        field[x + 1][y] = 2;
+      }
+      else if(field[x][y + 1] == 1) 
+      {
+        y += 2;
+
+        field[x][y - 1] = 2;
+      }
+      else if(field[x][y - 1] == 1) 
+      {
+        y -= 2;
+
+        field[x][y + 1] = 2;
+      }
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
 }
 
 
