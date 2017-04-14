@@ -7,7 +7,7 @@
 
 #define MAX_LENGTH 12
 
-int field[9][9] = 
+int field[9][9] =
 {
  {2, 2, 2, 2, 2, 2, 2, 2, 2},
  {2, 0, 0, 0, 0, 0, 0, 4, 2},
@@ -41,8 +41,10 @@ int minLength = MAX_LENGTH;
 int minRating = 2;
 int leftCounter = 2, rightCounter = 2;
 
-int main() 
-{  
+bool rotating = false;
+
+int main()
+{
    ev3dev::large_motor _left_motor(ev3dev::OUTPUT_B);
    ev3dev::large_motor _right_motor(ev3dev::OUTPUT_C);
 
@@ -53,7 +55,7 @@ int main()
    CRobot robot;
 
    int i = 7, j = 1;
-  
+
    try
    {
      while(true)
@@ -70,18 +72,20 @@ int main()
        }
        std::cout << std::endl;
 
-       std::cout << i << " " << j << std::endl;  
+       std::cout << i << " " << j << std::endl;
 
        if(field[i][j] == 4) break;
 
-       CheckSensors(leftSensor, rightSensor, forwardSensor, i, j);
+       if(!rotating) CheckSensors(leftSensor, rightSensor, forwardSensor, i, j);
    	   CheckMovement(i, j);
+
+       rotating = false;
 
    	   if(bMoveForward)
    	   {
    	   	  if(leftCounter == 0 || rightCounter == 0)
    	   	  {
-            robot.runForward(_left_motor, _right_motor, 1000, 360 * 2 - 100);
+            robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
 
    	   	    field[i + 1][j] = 1;
 
@@ -92,25 +96,31 @@ int main()
           {
             robot.turnRight(_left_motor, _right_motor);
 
+            rotating = true;
+
             leftCounter = rightCounter = 0;
           } else if(leftCounter == 2 || rightCounter == 2)
           {
             robot.turnRight(_left_motor, _right_motor);
             robot.turnRight(_left_motor, _right_motor);
 
+            rotating = true;
+
             leftCounter = rightCounter = 0;
           } else if(leftCounter == 3 || rightCounter == 1)
           {
             robot.turnLeft(_left_motor, _right_motor);
 
+            rotating = true;
+
             leftCounter = rightCounter = 0;
           }
-   	   } 
+   	   }
    	   else if(bMoveLeft)
    	   {
    	   	   if(leftCounter == 1 || rightCounter == 3)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 1000, 360 * 2 - 100);
+             robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
 
    	   	     field[i][j + 1] = 1;
 
@@ -121,10 +131,14 @@ int main()
            {
            	 robot.turnLeft(_left_motor, _right_motor);
 
+             rotating = true;
+
            	 leftCounter = 1, rightCounter = 0;
            } else if(leftCounter == 2 || rightCounter == 2)
            {
            	robot.turnRight(_left_motor, _right_motor);
+
+            rotating = true;
 
            	leftCounter = 1, rightCounter = 0;
            } else if(leftCounter == 3 || rightCounter == 1)
@@ -132,14 +146,16 @@ int main()
              robot.turnRight(_left_motor, _right_motor);
              robot.turnRight(_left_motor, _right_motor);
 
+             rotating = true;
+
              leftCounter = 1, rightCounter = 0;
            }
-   	   } 
+   	   }
    	   else if(bMoveRight)
    	   {
            if(leftCounter == 3 || rightCounter == 1)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 1000, 360 * 2 - 100);
+             robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
 
    	   	     field[i][j - 1] = 1;
 
@@ -150,10 +166,14 @@ int main()
            {
            	 robot.turnRight(_left_motor, _right_motor);
 
+             rotating = true;
+
            	 rightCounter = 0, leftCounter = 3;
            } else if(leftCounter == 2 || rightCounter == 2)
            {
              robot.turnLeft(_left_motor, _right_motor);
+
+             rotating = true;
 
            	 rightCounter = 0, leftCounter = 3;
            } else if(leftCounter == 1 || rightCounter == 3)
@@ -161,14 +181,16 @@ int main()
              robot.turnRight(_left_motor, _right_motor);
              robot.turnRight(_left_motor, _right_motor);
 
+             rotating = true;
+
              rightCounter = 0, leftCounter = 3;
            }
-   	   } 
+   	   }
    	   else if(bMoveBack)
    	   {
    	     if(leftCounter == 2 || rightCounter == 2)
    	     {
-           robot.runForward(_left_motor, _right_motor, 1000, 360 * 2 - 100);
+           robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
 
    	   	   field[i - 1][j] = 1;
 
@@ -179,16 +201,22 @@ int main()
          {
           robot.turnLeft(_left_motor, _right_motor);
 
+          rotating = true;
+
           leftCounter = rightCounter = 2;
          } else if(leftCounter == 3 || rightCounter == 1)
          {
           robot.turnRight(_left_motor, _right_motor);
+
+          rotating = true;
 
           leftCounter = rightCounter = 2;
          } else if(leftCounter == 0 || rightCounter == 0)
          {
           robot.turnRight(_left_motor, _right_motor);
           robot.turnRight(_left_motor, _right_motor);
+
+          rotating = true;
 
           leftCounter = rightCounter = 2;
          }
@@ -219,12 +247,12 @@ void CheckMovement(int x, int y)
 	if(CheckForward(x, y))
 	{
       rating = field[x + 1][y];
-         
+
       if(rating == minRating)
       {
         length = GetLength(x + 1, y);
 
-        if(length < minLength) 
+        if(length < minLength)
         {
           minLength = length;
           minRating = rating;
@@ -250,7 +278,7 @@ void CheckMovement(int x, int y)
       {
         length = GetLength(x - 1, y);
 
-        if(length < minLength) 
+        if(length < minLength)
         {
           minLength = length;
           minRating = rating;
@@ -278,7 +306,7 @@ void CheckMovement(int x, int y)
       {
         length = GetLength(x, y + 1);
 
-        if(length < minLength) 
+        if(length < minLength)
         {
           minLength = length;
           minRating = rating;
@@ -308,7 +336,7 @@ void CheckMovement(int x, int y)
       {
         length = GetLength(x, y - 1);
 
-        if(length < minLength) 
+        if(length < minLength)
         {
           minLength = length;
           minRating = rating;
@@ -406,7 +434,7 @@ void GoHome(int x, int y)
        }
       std::cout << std::endl;
 
-      std::cout << x << " " << y << std::endl;  
+      std::cout << x << " " << y << std::endl;
 
       if(field[x][y] == 3) break;
 
@@ -416,19 +444,19 @@ void GoHome(int x, int y)
 
         field[x - 1][y] = 2;
       }
-      else if(field[x - 1][y] == 1) 
+      else if(field[x - 1][y] == 1)
       {
       	x -= 2;
 
         field[x + 1][y] = 2;
       }
-      else if(field[x][y + 1] == 1) 
+      else if(field[x][y + 1] == 1)
       {
       	y += 2;
 
       	field[x][y - 1] = 2;
       }
-      else if(field[x][y - 1] == 1) 
+      else if(field[x][y - 1] == 1)
       {
       	y -= 2;
 
@@ -438,6 +466,3 @@ void GoHome(int x, int y)
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 }
-
-
-
