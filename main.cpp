@@ -26,7 +26,7 @@ bool CheckLeft(int x, int y);
 bool CheckRight(int x, int y);
 
 void CheckMovement(int x, int y);
-void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y);
+void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sensor &rightSensor, ev3dev::ultrasonic_sensor &forwardSensor, int x, int y);
 
 int GetLength(int x, int y);
 
@@ -45,14 +45,7 @@ bool rotating = false;
 
 int main()
 {
-   ev3dev::large_motor _left_motor(ev3dev::OUTPUT_B);
-   ev3dev::large_motor _right_motor(ev3dev::OUTPUT_C);
-
-   ev3dev::ultrasonic_sensor forwardSensor(ev3dev::INPUT_1);
-   ev3dev::ultrasonic_sensor leftSensor("in2:i2c1");
-   ev3dev::ultrasonic_sensor rightSensor("in3:i2c1");
-
-   CRobot robot(_left_motor, _right_motor);
+   CRobot robot();
 
    int i = 7, j = 1;
 
@@ -76,7 +69,7 @@ int main()
 
        if(field[i][j] == 4) break;
 
-       if(!rotating) CheckSensors(leftSensor, rightSensor, forwardSensor, i, j);
+       if(!rotating) CheckSensors(robot.leftSensor, robot.rightSensor, robot.forwardSensor, i, j);
    	   CheckMovement(i, j);
 
        rotating = false;
@@ -85,7 +78,7 @@ int main()
    	   {
    	   	  if(leftCounter == 0 || rightCounter == 0)
    	   	  {
-            robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
+            robot.runForward(700, 360 * 2 - 90);
 
    	   	    field[i + 1][j] = 1;
 
@@ -94,22 +87,22 @@ int main()
    	   	    i += 2;
           } else if(leftCounter == 1 || rightCounter == 3)
           {
-            robot.turnRight(_left_motor, _right_motor);
+            robot.turnRight();
 
             rotating = true;
 
             leftCounter = rightCounter = 0;
           } else if(leftCounter == 2 || rightCounter == 2)
           {
-            robot.turnRight(_left_motor, _right_motor);
-            robot.turnRight(_left_motor, _right_motor);
+            robot.turnRight();
+            robot.turnRight();
 
             rotating = true;
 
             leftCounter = rightCounter = 0;
           } else if(leftCounter == 3 || rightCounter == 1)
           {
-            robot.turnLeft(_left_motor, _right_motor);
+            robot.turnLeft();
 
             rotating = true;
 
@@ -120,7 +113,7 @@ int main()
    	   {
    	   	   if(leftCounter == 1 || rightCounter == 3)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
+             robot.runForward(700, 360 * 2 - 90);
 
    	   	     field[i][j + 1] = 1;
 
@@ -129,22 +122,22 @@ int main()
              j += 2;
            } else if(leftCounter == 0 || rightCounter == 0)
            {
-           	 robot.turnLeft(_left_motor, _right_motor);
+           	 robot.turnLeft();
 
              rotating = true;
 
            	 leftCounter = 1, rightCounter = 0;
            } else if(leftCounter == 2 || rightCounter == 2)
            {
-           	robot.turnRight(_left_motor, _right_motor);
+           	robot.turnRight();
 
             rotating = true;
 
            	leftCounter = 1, rightCounter = 0;
            } else if(leftCounter == 3 || rightCounter == 1)
            {
-             robot.turnRight(_left_motor, _right_motor);
-             robot.turnRight(_left_motor, _right_motor);
+             robot.turnRight();
+             robot.turnRight();
 
              rotating = true;
 
@@ -155,7 +148,7 @@ int main()
    	   {
            if(leftCounter == 3 || rightCounter == 1)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
+             robot.runForward(700, 360 * 2 - 90);
 
    	   	     field[i][j - 1] = 1;
 
@@ -164,22 +157,22 @@ int main()
              j -= 2;
            } else if(leftCounter == 0 || rightCounter == 0)
            {
-           	 robot.turnRight(_left_motor, _right_motor);
+           	 robot.turnRight();
 
              rotating = true;
 
            	 rightCounter = 0, leftCounter = 3;
            } else if(leftCounter == 2 || rightCounter == 2)
            {
-             robot.turnLeft(_left_motor, _right_motor);
+             robot.turnLeft();
 
              rotating = true;
 
            	 rightCounter = 0, leftCounter = 3;
            } else if(leftCounter == 1 || rightCounter == 3)
            {
-             robot.turnRight(_left_motor, _right_motor);
-             robot.turnRight(_left_motor, _right_motor);
+             robot.turnRight();
+             robot.turnRight();
 
              rotating = true;
 
@@ -190,7 +183,7 @@ int main()
    	   {
    	     if(leftCounter == 2 || rightCounter == 2)
    	     {
-           robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
+           robot.runForward(700, 360 * 2 - 90);
 
    	   	   field[i - 1][j] = 1;
 
@@ -199,22 +192,22 @@ int main()
    	       i -= 2;
          } else if(leftCounter == 1 || rightCounter == 3)
          {
-          robot.turnLeft(_left_motor, _right_motor);
+          robot.turnLeft();
 
           rotating = true;
 
           leftCounter = rightCounter = 2;
          } else if(leftCounter == 3 || rightCounter == 1)
          {
-          robot.turnRight(_left_motor, _right_motor);
+          robot.turnRight();
 
           rotating = true;
 
           leftCounter = rightCounter = 2;
          } else if(leftCounter == 0 || rightCounter == 0)
          {
-          robot.turnRight(_left_motor, _right_motor);
-          robot.turnRight(_left_motor, _right_motor);
+          robot.turnRight();
+          robot.turnRight();
 
           rotating = true;
 
