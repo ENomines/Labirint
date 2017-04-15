@@ -48,11 +48,11 @@ int main()
    ev3dev::large_motor _left_motor(ev3dev::OUTPUT_B);
    ev3dev::large_motor _right_motor(ev3dev::OUTPUT_C);
 
+   ev3dev::ultrasonic_sensor forwardSensor(ev3dev::INPUT_1);
    ev3dev::ultrasonic_sensor leftSensor("in2:i2c1");
    ev3dev::ultrasonic_sensor rightSensor("in3:i2c1");
-   ev3dev::ultrasonic_sensor forwardSensor(ev3dev::INPUT_1);
 
-   CRobot robot;
+   CRobot robot(_left_motor, _right_motor);
 
    int i = 7, j = 1;
 
@@ -85,7 +85,7 @@ int main()
    	   {
    	   	  if(leftCounter == 0 || rightCounter == 0)
    	   	  {
-            robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
+            robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
 
    	   	    field[i + 1][j] = 1;
 
@@ -120,7 +120,7 @@ int main()
    	   {
    	   	   if(leftCounter == 1 || rightCounter == 3)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
+             robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
 
    	   	     field[i][j + 1] = 1;
 
@@ -155,7 +155,7 @@ int main()
    	   {
            if(leftCounter == 3 || rightCounter == 1)
    	   	   {
-             robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
+             robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
 
    	   	     field[i][j - 1] = 1;
 
@@ -190,7 +190,7 @@ int main()
    	   {
    	     if(leftCounter == 2 || rightCounter == 2)
    	     {
-           robot.runForward(_left_motor, _right_motor, 800, 360 * 2 - 95);
+           robot.runForward(_left_motor, _right_motor, 700, 360 * 2 - 90);
 
    	   	   field[i - 1][j] = 1;
 
@@ -366,7 +366,7 @@ void CheckMovement(int x, int y)
 
 void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y)
 {
-    if(forwardSensor.distance_centimeters() <= 20)
+    if(forwardSensor.distance_centimeters() <= 15)
     {
       if(leftCounter == 0) field[x + 1][y] = 2;
       else if(leftCounter == 1) field[x][y + 1] = 2;
@@ -374,7 +374,7 @@ void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
       else if(leftCounter == 3) field[x][y - 1] = 2;
     }
 
-    if(leftSensor.distance_centimeters() <= 20)
+    if(leftSensor.distance_centimeters() <= 15)
     {
       if(leftCounter == 0) field[x][y + 1] = 2;
       else if(leftCounter == 1) field[x - 1][y] = 2;
@@ -382,7 +382,7 @@ void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
       else if(leftCounter == 3) field[x + 1][y] = 2;
     }
 
-    if(rightSensor.distance_centimeters() <= 20)
+    if(rightSensor.distance_centimeters() <= 15)
     {
       if(leftCounter == 0) field[x][y - 1] = 2;
       else if(leftCounter == 1) field[x + 1][y] = 2;
