@@ -6,11 +6,13 @@ CRobot::CRobot()
   rightMotor = ev3dev::large_motor(ev3dev::OUTPUT_B);
 
   forwardSensor = ev3dev::ultrasonic_sensor(ev3dev::INPUT_1);
-  leftSensor = ev3dev::ultrasonic_sensor(ev3dev::INPUT_2);
-  rightSensor = ev3dev::ultrasonic_sensor(ev3dev::INPUT_3);
+  leftSensor = ev3dev::ultrasonic_sensor("in2:i2c1");
+  rightSensor = ev3dev::ultrasonic_sensor("in3:i2c1");
 
 	leftMotor.set_stop_action("brake");
 	rightMotor.set_stop_action("brake");
+
+  es = leftSensor.distance_centimeters()-rightSensor.distance_centimeters();
 }
 
 void CRobot::turn(ev3dev::large_motor motor, int speed, int position)
@@ -19,7 +21,7 @@ void CRobot::turn(ev3dev::large_motor motor, int speed, int position)
 	motor.set_speed_sp(speed).run_to_rel_pos();
 }
 
-void CRobot::turnLeft(ev3dev::large_motor leftMotor, ev3dev::large_motor rightMotor)
+void CRobot::turnLeft()
 {
      turn(leftMotor, 600, 180);
      turn(rightMotor, 600, -180);
@@ -27,7 +29,7 @@ void CRobot::turnLeft(ev3dev::large_motor leftMotor, ev3dev::large_motor rightMo
      while(leftMotor.state().count("running") && rightMotor.state().count("running"))
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
-void CRobot::turnRight(ev3dev::large_motor leftMotor, ev3dev::large_motor rightMotor)
+void CRobot::turnRight()
 {
      turn(leftMotor, 600, -210);
      turn(rightMotor, 600, 210);
@@ -36,33 +38,48 @@ void CRobot::turnRight(ev3dev::large_motor leftMotor, ev3dev::large_motor rightM
        	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
- void CRobot::runForward(ev3dev::large_motor leftMotor, ev3dev::large_motor rightMotor, int speed, int position)
+ void CRobot::runForward(int speed, int position)
  {
       leftMotor.set_position(-position);
       rightMotor.set_position(-position);
 
-      rightMotor.set_speed_sp(speed);
-			leftMotor.set_speed_sp(speed);
+      rightMotor.set_speed_sp(speed).run_to_abs_pos();
+			leftMotor.set_speed_sp(speed).run_to_abs_pos();
 
-      static int deltaSpeed = 0;
+      static int vmax = 800;
+      static float k1 = 0.8;
+      static float k2 = 4;
+      static float v = 500;
+      static float errold = 0;
 
-      while(_left_motor.state().count("running") && _right_motor.state().count("running"))
+      static int err,u,mB,mC;
+
+      while(leftMotor.state().count("running") && rightMotor.state().count("running"))
       {
+        if (leftMotor.position() == 0 && rightMotor.position() == 0) break;
+        err = leftSensor.distance_centimeters() - rightSensor.distance_centimeters() - es;
+
+        u = k1 * err + k2 * (err - errold);
+        err = errold;
+
+        mB = v - u;
+        mC = v + u;
+
+        if (abs(mB)>vmax) mB = vmax;
+        if (abs(mC)>vmax) mC = vmax;
+
         if(leftSensor.distance_centimeters() < 30)
         {
-           deltaSpeed = leftSensor.distance_centimeters() - 15;
-          _left_motor.set_speed_sp(speed + deltaSpeed).run_to_abs_pos();
+           rightMotor.set_speed_sp(mC).run_to_abs_pos();
         }
-
         if(rightSensor.distance_centimeters() < 30)
         {
-           deltaSpeed = rightSensor.distance_centimeters() - 15;
-          _right_motor.set_speed_sp(speed + deltaSpeed).run_to_abs_pos();
+          leftMotor.set_speed_sp(mB).run_to_abs_pos();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
 }
- void CRobot::runBack(ev3dev::large_motor leftMotor, ev3dev::large_motor rightMotor, int speed, int position)
+ void CRobot::runBack(int speed, int position)
  {
  	   leftMotor.set_position(position);
      rightMotor.set_position(position);

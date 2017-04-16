@@ -264,7 +264,7 @@ int device::device_index() const
     for (auto it=_path.rbegin(); it!=_path.rend(); ++it)
     {
       if(*it =='/')
-        continue;		
+        continue;
       if ((*it < '0') || (*it > '9'))
         break;
 
@@ -656,6 +656,7 @@ constexpr char ultrasonic_sensor::mode_us_si_in[];
 ultrasonic_sensor::ultrasonic_sensor(address_type address) :
   sensor(address, { ev3_ultrasonic, nxt_ultrasonic })
 {
+    set_mode(mode_us_dist_cm);
 }
 
 //-----------------------------------------------------------------------------
