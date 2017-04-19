@@ -26,6 +26,14 @@ class CRobot
   private:
   	void turn(ev3dev::large_motor motor, int speed, int position);
 
-    int es = 0;
+    const int kP = 3;
+    const int kD = 2;
+
+    int error = 0;
+    int oldErrorLeft = 0;
+    int oldErrorRight = 0;
+    int deltaSpeed = 0;
+
+    bool activation = false;
 
 };

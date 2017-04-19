@@ -120,11 +120,11 @@ protected:
 // The sensor class provides a uniform interface for using most of the
 // sensors available for the EV3. The various underlying device drivers will
 // create a `lego-sensor` device for interacting with the sensors.
-// 
+//
 // Sensors are primarily controlled by setting the `mode` and monitored by
 // reading the `value<N>` attributes. Values can be converted to floating point
 // if needed by `value<N>` / 10.0 ^ `decimals`.
-// 
+//
 // Since the name of the `sensor<N>` device node does not correspond to the port
 // that a sensor is plugged in to, you must look at the `address` attribute if
 // you need to know which port a sensor is plugged in to. However, if you don't
@@ -428,11 +428,9 @@ public:
   // Single measurement in inches.
   static constexpr char mode_us_si_in[] = "US-SI-IN";
 
-
   // Measurement of the distance detected by the sensor,
   // in centimeters.
-  float distance_centimeters(bool do_set_mode = true) {
-    if (do_set_mode) set_mode(mode_us_dist_cm);
+  float distance_centimeters() {
     return float_value(0);
   }
 
@@ -616,7 +614,7 @@ public:
 // positional and directional feedback such as the EV3 and NXT motors.
 // This feedback allows for precise control of the motors. This is the
 // most common type of motor, so we just call it `motor`.
-// 
+//
 // The way to configure a motor is to set the '_sp' attributes when
 // calling a command or before. Only in 'run_direct' mode attribute
 // changes are processed immediately, in the other modes they only
@@ -733,7 +731,7 @@ public:
   // Returns a list of commands that are supported by the motor
   // controller. Possible values are `run-forever`, `run-to-abs-pos`, `run-to-rel-pos`,
   // `run-timed`, `run-direct`, `stop` and `reset`. Not all commands may be supported.
-  // 
+  //
   // - `run-forever` will cause the motor to run until another command is sent.
   // - `run-to-abs-pos` will run to an absolute position specified by `position_sp`
   //   and then stop using the action specified in `stop_action`.
@@ -1384,7 +1382,7 @@ public:
   // complex. A simple trigger isn't configurable and is designed to slot into
   // existing subsystems with minimal additional code. Examples are the `ide-disk` and
   // `nand-disk` triggers.
-  // 
+  //
   // Complex triggers whilst available to all LEDs have LED specific
   // parameters and work on a per LED basis. The `timer` trigger is an example.
   // The `timer` trigger will periodically change the LED brightness between
@@ -1676,12 +1674,12 @@ protected:
 // WeDo and LEGO Power Functions sensors and motors. Supported devices include
 // the LEGO MINDSTORMS EV3 Intelligent Brick, the LEGO WeDo USB hub and
 // various sensor multiplexers from 3rd party manufacturers.
-// 
+//
 // Some types of ports may have multiple modes of operation. For example, the
 // input ports on the EV3 brick can communicate with sensors using UART, I2C
 // or analog validate signals - but not all at the same time. Therefore there
 // are multiple modes available to connect to the different types of sensors.
-// 
+//
 // In most cases, ports are able to automatically detect what type of sensor
 // or motor is connected. In some cases though, this must be manually specified
 // using the `mode` and `set_device` attributes. The `mode` attribute affects
@@ -1691,7 +1689,7 @@ protected:
 // appropriate for the connected sensor. The `set_device` attribute is used to
 // specify the exact type of sensor that is connected. Note: the mode must be
 // correctly set before setting the sensor type.
-// 
+//
 // Ports can be found at `/sys/class/lego-port/port<N>` where `<N>` is
 // incremented each time a new port is registered. Note: The number is not
 // related to the actual port at all - use the `address` attribute to find

@@ -6,9 +6,29 @@ int main()
   {
     CRobot robot;
 
-    robot.runForward(500, 360 * 2 - 70);
-    robot.runForward(500, 360 * 2 - 70);
-    robot.runForward(500, 360 * 2 - 100);
+    const int position = -360 * 2 + 72;
+    const int speed = 500;
+
+    robot.runForward(speed, position);
+    robot.runForward(speed, position);
+    robot.runForward(speed, position);
+    robot.turnRight();
+    robot.turnRight();
+    robot.runForward(speed, position);
+    robot.turnLeft();
+    robot.runForward(speed, position);
+    robot.turnRight();
+    robot.runForward(speed, position);
+    robot.runForward(speed, position);
+    robot.turnLeft();
+    robot.runForward(speed, position);
+    robot.turnLeft();
+    robot.runForward(speed, position);
+    robot.turnRight();
+    robot.runForward(speed, position);
+    robot.turnLeft();
+    robot.runForward(speed, position);
+    robot.runForward(speed, position);
 
   } catch (std::exception& e)
   {

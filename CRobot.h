@@ -1,92 +1,39 @@
-#include "CRobot.h"
+#include "ev3dev.h"
 
-CRobot::CRobot()
+#include <thread>
+#include <chrono>
+
+#include <iostream>
+
+class CRobot
 {
-  leftMotor = ev3dev::large_motor(ev3dev::OUTPUT_A);
-  rightMotor = ev3dev::large_motor(ev3dev::OUTPUT_B);
+  public:
+    CRobot();
 
-  forwardSensor = ev3dev::ultrasonic_sensor(ev3dev::INPUT_1);
-  leftSensor = ev3dev::ultrasonic_sensor("in2:i2c1");
-  rightSensor = ev3dev::ultrasonic_sensor("in3:i2c1");
+    void turnLeft();
+    void turnRight();
 
-	leftMotor.set_stop_action("brake");
-	rightMotor.set_stop_action("brake");
+    void runForward(int speed, int position);
+    void runBack(int speed, int position);
 
-  es = leftSensor.distance_centimeters()-rightSensor.distance_centimeters();
-}
+  	ev3dev::large_motor leftMotor;
+    ev3dev::large_motor rightMotor;
 
-void CRobot::turn(ev3dev::large_motor motor, int speed, int position)
-{
-	motor.set_position_sp(position);
-	motor.set_speed_sp(speed).run_to_rel_pos();
-}
+    ev3dev::ultrasonic_sensor forwardSensor;
+    ev3dev::ultrasonic_sensor leftSensor;
+    ev3dev::ultrasonic_sensor rightSensor;
 
-void CRobot::turnLeft()
-{
-     turn(leftMotor, 600, 180);
-     turn(rightMotor, 600, -180);
+  private:
+  	void turn(ev3dev::large_motor motor, int speed, int position);
 
-     while(leftMotor.state().count("running") && rightMotor.state().count("running"))
-       std::this_thread::sleep_for(std::chrono::milliseconds(10));
-}
-void CRobot::turnRight()
-{
-     turn(leftMotor, 600, -210);
-     turn(rightMotor, 600, 210);
+    const int kP = 3;
+    const int kD = 2;
 
-     while(leftMotor.state().count("running") && rightMotor.state().count("running"))
-       	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-}
+    int error = 0;
+    int oldErrorLeft = 0;
+    int oldErrorRight = 0;
+    int deltaSpeed = 0;
 
- void CRobot::runForward(int speed, int position)
- {
-      leftMotor.set_position(-position);
-      rightMotor.set_position(-position);
+    bool activation = false;
 
-      rightMotor.set_speed_sp(speed).run_to_abs_pos();
-			leftMotor.set_speed_sp(speed).run_to_abs_pos();
-
-      static int vmax = 800;
-      static float k1 = 0.8;
-      static float k2 = 4;
-      static float v = 500;
-      static float errold = 0;
-
-      static int err,u,mB,mC;
-
-      while(leftMotor.state().count("running") && rightMotor.state().count("running"))
-      {
-        if (leftMotor.position() == 0 && rightMotor.position() == 0) break;
-        err = leftSensor.distance_centimeters() - rightSensor.distance_centimeters() - es;
-
-        u = k * err + k2 * (err - errold);
-        err = errold;
-
-        mB = v - u;
-        mC = v + u;
-
-        if (abs(mB)>vmax) mB = vmax;
-        if (abs(mC)>vmax) mC = vmax;
-
-        if(leftSensor.distance_centimeters() < 30)
-        {
-           rightMotor.set_speed_sp(mC).run_to_abs_pos();
-        }
-        if(rightSensor.distance_centimeters() < 30)
-        {
-          leftMotor.set_speed_sp(mB).run_to_abs_pos();
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      }
-}
- void CRobot::runBack(int speed, int position)
- {
- 	   leftMotor.set_position(position);
-     rightMotor.set_position(position);
-
-     leftMotor.set_speed_sp(speed).run_to_abs_pos();
-     rightMotor.set_speed_sp(speed).run_to_abs_pos();
-
-     while(leftMotor.state().count("running") && rightMotor.state().count("running"))
-       std::this_thread::sleep_for(std::chrono::milliseconds(10));
- }
+};

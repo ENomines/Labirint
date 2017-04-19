@@ -10,7 +10,7 @@
 int field[9][9] =
 {
  {2, 2, 2, 2, 2, 2, 2, 2, 2},
- {2, 0, 0, 0, 0, 0, 0, 4, 2},
+ {2, 0, 0, 0, 0, 0, 2, 4, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
@@ -43,9 +43,12 @@ int leftCounter = 2, rightCounter = 2;
 
 bool rotating = false;
 
+const int position = -360 * 2 + 70;
+const int speed = 500;
+
 int main()
 {
-   CRobot robot();
+   CRobot robot;
 
    int i = 7, j = 1;
 
@@ -78,7 +81,7 @@ int main()
    	   {
    	   	  if(leftCounter == 0 || rightCounter == 0)
    	   	  {
-            robot.runForward(700, 360 * 2 - 90);
+            robot.runForward(speed, position);
 
    	   	    field[i + 1][j] = 1;
 
@@ -113,7 +116,7 @@ int main()
    	   {
    	   	   if(leftCounter == 1 || rightCounter == 3)
    	   	   {
-             robot.runForward(700, 360 * 2 - 90);
+             robot.runForward(speed, position);
 
    	   	     field[i][j + 1] = 1;
 
@@ -148,7 +151,7 @@ int main()
    	   {
            if(leftCounter == 3 || rightCounter == 1)
    	   	   {
-             robot.runForward(700, 360 * 2 - 90);
+             robot.runForward(speed, position);
 
    	   	     field[i][j - 1] = 1;
 
@@ -183,7 +186,7 @@ int main()
    	   {
    	     if(leftCounter == 2 || rightCounter == 2)
    	     {
-           robot.runForward(700, 360 * 2 - 90);
+           robot.runForward(speed, position);
 
    	   	   field[i - 1][j] = 1;
 
@@ -357,7 +360,7 @@ void CheckMovement(int x, int y)
 	minRating = 2;
 }
 
-void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_sensor rightSensor, ev3dev::ultrasonic_sensor forwardSensor, int x, int y)
+void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sensor &rightSensor, ev3dev::ultrasonic_sensor &forwardSensor, int x, int y)
 {
     if(forwardSensor.distance_centimeters() <= 15)
     {
@@ -369,17 +372,17 @@ void CheckSensors(ev3dev::ultrasonic_sensor leftSensor, ev3dev::ultrasonic_senso
 
     if(leftSensor.distance_centimeters() <= 15)
     {
-      if(leftCounter == 0) field[x][y + 1] = 2;
+      if(leftCounter == 0) field[x][y - 1] = 2;
       else if(leftCounter == 1) field[x - 1][y] = 2;
-      else if(leftCounter == 2) field[x][y - 1] = 2;
+      else if(leftCounter == 2) field[x][y + 1] = 2;
       else if(leftCounter == 3) field[x + 1][y] = 2;
     }
 
     if(rightSensor.distance_centimeters() <= 15)
     {
-      if(leftCounter == 0) field[x][y - 1] = 2;
+      if(leftCounter == 0) field[x][y + 1] = 2;
       else if(leftCounter == 1) field[x + 1][y] = 2;
-      else if(leftCounter == 2) field[x][y + 1] = 2;
+      else if(leftCounter == 2) field[x][y - 1] = 2;
       else if(leftCounter == 3) field[x - 1][y] = 2;
     }
 }
