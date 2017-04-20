@@ -83,9 +83,9 @@ int main()
    	   	  {
             robot.runForward(speed, position);
 
-   	   	    field[i + 1][j] = 1;
+   	   	    field[i - 1][j] = 1;
 
-   	   	    if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && field[i][j] != 3) field[i + 1][j] = 2;
+   	   	    if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && field[i][j] != 3) field[i - 1][j] = 2;
 
    	   	    i += 2;
           } else if(leftCounter == 1 || rightCounter == 3)
@@ -118,9 +118,9 @@ int main()
    	   	   {
              robot.runForward(speed, position);
 
-   	   	     field[i][j + 1] = 1;
+   	   	     field[i][j - 1] = 1;
 
-   	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckRight(i,j) && field[i][j] != 3) field[i][j + 1] = 2;
+   	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckRight(i,j) && field[i][j] != 3) field[i][j - 1] = 2;
 
              j += 2;
            } else if(leftCounter == 0 || rightCounter == 0)
@@ -153,9 +153,9 @@ int main()
    	   	   {
              robot.runForward(speed, position);
 
-   	   	     field[i][j - 1] = 1;
+   	   	     field[i][j + 1] = 1;
 
-   	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckLeft(i,j) && field[i][j] != 3) field[i][j - 1] = 2;
+   	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckLeft(i,j) && field[i][j] != 3) field[i][j + 1] = 2;
 
              j -= 2;
            } else if(leftCounter == 0 || rightCounter == 0)
@@ -188,9 +188,9 @@ int main()
    	     {
            robot.runForward(speed, position);
 
-   	   	   field[i - 1][j] = 1;
+   	   	   field[i + 1][j] = 1;
 
-           if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && field[i][j] != 3) field[i - 1][j] = 2;
+           if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && field[i][j] != 3) field[i + 1][j] = 2;
 
    	       i -= 2;
          } else if(leftCounter == 1 || rightCounter == 3)
@@ -242,11 +242,11 @@ void CheckMovement(int x, int y)
 
 	if(CheckForward(x, y))
 	{
-      rating = field[x + 1][y];
+      rating = field[x - 1][y];
 
       if(rating == minRating)
       {
-        length = GetLength(x + 1, y);
+        length = GetLength(x - 1, y);
 
         if(length < minLength)
         {
@@ -268,11 +268,11 @@ void CheckMovement(int x, int y)
 
 	if(CheckBack(x, y))
 	{
-      rating = field[x - 1][y];
+      rating = field[x + 1][y];
 
       if(rating == minRating)
       {
-        length = GetLength(x - 1, y);
+        length = GetLength(x + 1, y);
 
         if(length < minLength)
         {
@@ -284,7 +284,7 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
-        length = GetLength(x - 1, y);
+        length = GetLength(x + 1, y);
 
       	minLength = length;
       	minRating = rating;
@@ -296,11 +296,11 @@ void CheckMovement(int x, int y)
 
 	if(CheckLeft(x, y))
 	{
-      rating = field[x][y + 1];
+      rating = field[x][y - 1];
 
       if(rating == minRating)
       {
-        length = GetLength(x, y + 1);
+        length = GetLength(x, y - 1);
 
         if(length < minLength)
         {
@@ -313,7 +313,7 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
-        length = GetLength(x, y + 1);
+        length = GetLength(x, y - 1);
 
       	minLength = length;
       	minRating = rating;
@@ -326,11 +326,11 @@ void CheckMovement(int x, int y)
 
 	if(CheckRight(x, y))
 	{
-	  rating = field[x][y - 1];
+	  rating = field[x][y + 1];
 
       if(rating == minRating)
       {
-        length = GetLength(x, y - 1);
+        length = GetLength(x, y + 1);
 
         if(length < minLength)
         {
@@ -344,7 +344,7 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
-        length = GetLength(x, y - 1);
+        length = GetLength(x, y + 1);
 
       	minLength = length;
       	minRating = rating;
@@ -364,46 +364,46 @@ void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sens
 {
     if(forwardSensor.distance_centimeters() <= 15)
     {
-      if(leftCounter == 0) field[x + 1][y] = 2;
-      else if(leftCounter == 1) field[x][y + 1] = 2;
-      else if(leftCounter == 2) field[x - 1][y] = 2;
-      else if(leftCounter == 3) field[x][y - 1] = 2;
+      if(leftCounter == 0) field[x - 1][y] = 2;
+      else if(leftCounter == 1) field[x][y - 1] = 2;
+      else if(leftCounter == 2) field[x + 1][y] = 2;
+      else if(leftCounter == 3) field[x][y + 1] = 2;
     }
 
     if(leftSensor.distance_centimeters() <= 15)
     {
       if(leftCounter == 0) field[x][y - 1] = 2;
-      else if(leftCounter == 1) field[x - 1][y] = 2;
+      else if(leftCounter == 1) field[x + 1][y] = 2;
       else if(leftCounter == 2) field[x][y + 1] = 2;
-      else if(leftCounter == 3) field[x + 1][y] = 2;
+      else if(leftCounter == 3) field[x - 1][y] = 2;
     }
 
     if(rightSensor.distance_centimeters() <= 15)
     {
       if(leftCounter == 0) field[x][y + 1] = 2;
-      else if(leftCounter == 1) field[x + 1][y] = 2;
+      else if(leftCounter == 1) field[x - 1][y] = 2;
       else if(leftCounter == 2) field[x][y - 1] = 2;
-      else if(leftCounter == 3) field[x - 1][y] = 2;
+      else if(leftCounter == 3) field[x + 1][y] = 2;
     }
 }
 
 bool CheckForward(int x, int y)
 {
-	return field[x + 1][y] != 2;
+	return field[x - 1][y] != 2;
 }
 
 bool CheckBack(int x, int y)
 {
-	return field[x - 1][y] != 2;
+	return field[x + 1][y] != 2;
 }
 
 bool CheckLeft(int x, int y)
 {
-	return field[x][y + 1] != 2;
+	return field[x][y - 1] != 2;
 }
 bool CheckRight(int x, int y)
 {
-	return field[x][y - 1] != 2;
+	return field[x][y + 1] != 2;
 }
 
 int GetLength(int x, int y)
