@@ -24,16 +24,16 @@ void CRobot::turn(ev3dev::large_motor motor, int speed, int position)
 
 void CRobot::turnLeft()
 {
-     turn(leftMotor, 600, 205);
-     turn(rightMotor, 600, -205);
+     turn(leftMotor, 600, 208);
+     turn(rightMotor, 600, -208);
 
      while(leftMotor.state().count("running") || rightMotor.state().count("running"))
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 void CRobot::turnRight()
 {
-     turn(leftMotor, 600, -205);
-     turn(rightMotor, 600, 205);
+     turn(leftMotor, 600, -208);
+     turn(rightMotor, 600, 208);
 
      while(leftMotor.state().count("running") || rightMotor.state().count("running"))
        	std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -53,8 +53,6 @@ void CRobot::turnRight()
    activation = false;
 
    oldErrorLeft = 0, oldErrorRight = 0;
-
-   std::cout << "Running..." << std::endl;
 
    while (leftMotor.state().count("running") || rightMotor.state().count("running"))
    {
@@ -82,7 +80,6 @@ void CRobot::turnRight()
        rightMotor.set_speed_sp(rightMotor.speed() + deltaSpeed).run_to_abs_pos();
      }
    }
-   std::cout << "Stop" << std::endl;
 }
  void CRobot::runBack(int speed, int position)
  {
@@ -92,6 +89,12 @@ void CRobot::turnRight()
      leftMotor.set_speed_sp(speed).run_to_abs_pos();
      rightMotor.set_speed_sp(speed).run_to_abs_pos();
 
-     while(leftMotor.state().count("running") && rightMotor.state().count("running"))
+     while(leftMotor.state().count("running") || rightMotor.state().count("running"))
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+ }
+
+ CRobot::~CRobot()
+ {
+   leftMotor.reset();
+   rightMotor.reset();
  }

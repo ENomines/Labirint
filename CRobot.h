@@ -9,6 +9,7 @@ class CRobot
 {
   public:
     CRobot();
+    ~CRobot();
 
     void turnLeft();
     void turnRight();

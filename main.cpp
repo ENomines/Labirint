@@ -1,7 +1,4 @@
 #include <cstdlib>
-#include <iostream>
-#include <chrono>
-#include <thread>
 
 #include "CRobot.h"
 
@@ -10,7 +7,7 @@
 int field[9][9] =
 {
  {2, 2, 2, 2, 2, 2, 2, 2, 2},
- {2, 0, 0, 0, 0, 0, 2, 4, 2},
+ {2, 0, 0, 0, 0, 0, 0, 4, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
  {2, 0, 0, 0, 0, 0, 0, 0, 2},
@@ -39,17 +36,17 @@ bool bMoveRight = false;
 
 int minLength = MAX_LENGTH;
 int minRating = 2;
-int leftCounter = 2, rightCounter = 2;
+int leftCounter = 0;
 
 bool rotating = false;
 
 const int position = -360 * 2 + 70;
 const int speed = 500;
 
+CRobot robot;
+
 int main()
 {
-   CRobot robot;
-
    int i = 7, j = 1;
 
    try
@@ -62,7 +59,11 @@ int main()
        {
          for(int y = 0; y < 9; y++)
          {
-           std::cout << field[x][y] << " ";
+           if (field[x][y] == 0) std::cout << "~ ";
+           if (field[x][y] == 2) std::cout << "# ";
+           if (field[x][y] == 1) std::cout << "* ";
+           if (field[x][y] == 3) std::cout << "s ";
+           if (field[x][y] == 4) std::cout << "f ";
          }
          std::cout << std::endl;
        }
@@ -79,7 +80,7 @@ int main()
 
    	   if(bMoveForward)
    	   {
-   	   	  if(leftCounter == 0 || rightCounter == 0)
+   	   	  if(leftCounter == 0)
    	   	  {
             robot.runForward(speed, position);
 
@@ -87,34 +88,34 @@ int main()
 
    	   	    if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckBack(i,j) && field[i][j] != 3) field[i - 1][j] = 2;
 
-   	   	    i += 2;
-          } else if(leftCounter == 1 || rightCounter == 3)
+   	   	    i -= 2;
+          } else if(leftCounter == 1)
           {
             robot.turnRight();
 
             rotating = true;
 
-            leftCounter = rightCounter = 0;
-          } else if(leftCounter == 2 || rightCounter == 2)
+            leftCounter = 0;
+          } else if(leftCounter == 2)
           {
             robot.turnRight();
             robot.turnRight();
 
             rotating = true;
 
-            leftCounter = rightCounter = 0;
-          } else if(leftCounter == 3 || rightCounter == 1)
+            leftCounter = 0;
+          } else if(leftCounter == 3)
           {
             robot.turnLeft();
 
             rotating = true;
 
-            leftCounter = rightCounter = 0;
+            leftCounter = 0;
           }
    	   }
    	   else if(bMoveLeft)
    	   {
-   	   	   if(leftCounter == 1 || rightCounter == 3)
+   	   	   if(leftCounter == 1)
    	   	   {
              robot.runForward(speed, position);
 
@@ -122,34 +123,34 @@ int main()
 
    	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckRight(i,j) && field[i][j] != 3) field[i][j - 1] = 2;
 
-             j += 2;
-           } else if(leftCounter == 0 || rightCounter == 0)
+             j -= 2;
+           } else if(leftCounter == 0)
            {
            	 robot.turnLeft();
 
              rotating = true;
 
-           	 leftCounter = 1, rightCounter = 0;
-           } else if(leftCounter == 2 || rightCounter == 2)
+           	 leftCounter = 1;
+           } else if(leftCounter == 2)
            {
            	robot.turnRight();
 
             rotating = true;
 
-           	leftCounter = 1, rightCounter = 0;
-           } else if(leftCounter == 3 || rightCounter == 1)
+           	leftCounter = 1;
+           } else if(leftCounter == 3)
            {
              robot.turnRight();
              robot.turnRight();
 
              rotating = true;
 
-             leftCounter = 1, rightCounter = 0;
+             leftCounter = 1;
            }
    	   }
    	   else if(bMoveRight)
    	   {
-           if(leftCounter == 3 || rightCounter == 1)
+           if(leftCounter == 3)
    	   	   {
              robot.runForward(speed, position);
 
@@ -157,34 +158,34 @@ int main()
 
    	   	     if(!CheckForward(i,j) && !CheckBack(i,j) && !CheckLeft(i,j) && field[i][j] != 3) field[i][j + 1] = 2;
 
-             j -= 2;
-           } else if(leftCounter == 0 || rightCounter == 0)
+             j += 2;
+           } else if(leftCounter == 0)
            {
            	 robot.turnRight();
 
              rotating = true;
 
-           	 rightCounter = 0, leftCounter = 3;
-           } else if(leftCounter == 2 || rightCounter == 2)
+           	 leftCounter = 3;
+           } else if(leftCounter == 2)
            {
              robot.turnLeft();
 
              rotating = true;
 
-           	 rightCounter = 0, leftCounter = 3;
-           } else if(leftCounter == 1 || rightCounter == 3)
+           	 leftCounter = 3;
+           } else if(leftCounter == 1)
            {
              robot.turnRight();
              robot.turnRight();
 
              rotating = true;
 
-             rightCounter = 0, leftCounter = 3;
+             leftCounter = 3;
            }
    	   }
    	   else if(bMoveBack)
    	   {
-   	     if(leftCounter == 2 || rightCounter == 2)
+   	     if(leftCounter == 2)
    	     {
            robot.runForward(speed, position);
 
@@ -192,29 +193,29 @@ int main()
 
            if(!CheckLeft(i,j) && !CheckRight(i,j) && !CheckForward(i,j) && field[i][j] != 3) field[i + 1][j] = 2;
 
-   	       i -= 2;
-         } else if(leftCounter == 1 || rightCounter == 3)
+   	       i += 2;
+         } else if(leftCounter == 1)
          {
           robot.turnLeft();
 
           rotating = true;
 
-          leftCounter = rightCounter = 2;
-         } else if(leftCounter == 3 || rightCounter == 1)
+          leftCounter = 2;
+         } else if(leftCounter == 3)
          {
           robot.turnRight();
 
           rotating = true;
 
-          leftCounter = rightCounter = 2;
-         } else if(leftCounter == 0 || rightCounter == 0)
+          leftCounter = 2;
+         } else if(leftCounter == 0)
          {
           robot.turnRight();
           robot.turnRight();
 
           rotating = true;
 
-          leftCounter = rightCounter = 2;
+          leftCounter = 2;
          }
    	   } else break;
 
@@ -230,7 +231,7 @@ int main()
      exit(0);
    }
 
- //  GoHome(i, j);
+   GoHome(i, j);
 
    return 0;
 }
@@ -257,7 +258,7 @@ void CheckMovement(int x, int y)
         }
       } else if(rating < minRating)
       {
-        length = GetLength(x + 1, y);
+        length = GetLength(x - 1, y);
 
         minLength = length;
         minRating = rating;
@@ -362,7 +363,7 @@ void CheckMovement(int x, int y)
 
 void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sensor &rightSensor, ev3dev::ultrasonic_sensor &forwardSensor, int x, int y)
 {
-    if(forwardSensor.distance_centimeters() <= 15)
+    if(forwardSensor.distance_centimeters() <= 18)
     {
       if(leftCounter == 0) field[x - 1][y] = 2;
       else if(leftCounter == 1) field[x][y - 1] = 2;
@@ -370,7 +371,7 @@ void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sens
       else if(leftCounter == 3) field[x][y + 1] = 2;
     }
 
-    if(leftSensor.distance_centimeters() <= 15)
+    if(leftSensor.distance_centimeters() <= 18)
     {
       if(leftCounter == 0) field[x][y - 1] = 2;
       else if(leftCounter == 1) field[x + 1][y] = 2;
@@ -378,7 +379,7 @@ void CheckSensors(ev3dev::ultrasonic_sensor &leftSensor, ev3dev::ultrasonic_sens
       else if(leftCounter == 3) field[x - 1][y] = 2;
     }
 
-    if(rightSensor.distance_centimeters() <= 15)
+    if(rightSensor.distance_centimeters() <= 18)
     {
       if(leftCounter == 0) field[x][y + 1] = 2;
       else if(leftCounter == 1) field[x - 1][y] = 2;
@@ -422,9 +423,13 @@ void GoHome(int x, int y)
 
        for(int i = 0; i < 9; i++)
        {
-         for(int j = 0; j < 17; j++)
+         for(int j = 0; j < 9; j++)
          {
-           std::cout << field[i][j] << " ";
+           if (field[i][j] == 0) std::cout << "~ ";
+           if (field[i][j] == 2) std::cout << "# ";
+           if (field[i][j] == 1) std::cout << "* ";
+           if (field[i][j] == 3) std::cout << "s ";
+           if (field[i][j] == 4) std::cout << "f ";
          }
          std::cout << std::endl;
        }
@@ -434,31 +439,113 @@ void GoHome(int x, int y)
 
       if(field[x][y] == 3) break;
 
-      if(field[x + 1][y] == 1)
+      if(field[x - 1][y] == 1)
       {
-        x += 2;
+         if(leftCounter == 0)
+         {
+           robot.runForward(speed, position);
 
-        field[x - 1][y] = 2;
-      }
-      else if(field[x - 1][y] == 1)
-      {
-      	x -= 2;
+           field[x - 1][y] = 2;
 
-        field[x + 1][y] = 2;
-      }
-      else if(field[x][y + 1] == 1)
-      {
-      	y += 2;
+           x -= 2;
+         } else if(leftCounter == 1)
+         {
+           robot.turnRight();
 
-      	field[x][y - 1] = 2;
+           leftCounter = 0;
+         } else if(leftCounter == 2)
+         {
+           robot.turnRight();
+           robot.turnRight();
+
+           leftCounter = 0;
+         } else if(leftCounter == 3)
+         {
+           robot.turnLeft();
+
+           leftCounter = 0;
+         }
       }
       else if(field[x][y - 1] == 1)
       {
-      	y -= 2;
+          if(leftCounter == 1)
+          {
+            robot.runForward(speed, position);
 
-      	field[x][y + 1] = 2;
+            field[x][y - 1] = 2;
+
+            y -= 2;
+          } else if(leftCounter == 0)
+          {
+            robot.turnLeft();
+
+            leftCounter = 1;
+          } else if(leftCounter == 2)
+          {
+           robot.turnRight();
+
+           leftCounter = 1;
+          } else if(leftCounter == 3)
+          {
+            robot.turnRight();
+            robot.turnRight();
+
+            leftCounter = 1;
+          }
       }
+      else if(field[x][y + 1] == 1)
+      {
+          if(leftCounter == 3)
+          {
+            robot.runForward(speed, position);
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            field[x][y + 1] = 2;
+
+            y += 2;
+          } else if(leftCounter == 0)
+          {
+            robot.turnRight();
+
+            leftCounter = 3;
+          } else if(leftCounter == 2)
+          {
+            robot.turnLeft();
+
+            leftCounter = 3;
+          } else if(leftCounter == 1)
+          {
+            robot.turnRight();
+            robot.turnRight();
+
+            leftCounter = 3;
+          }
+      }
+      else if(field[x + 1][y] == 1)
+      {
+        if(leftCounter == 2)
+        {
+          robot.runForward(speed, position);
+
+          field[x + 1][y] = 2;
+
+          x += 2;
+        } else if(leftCounter == 1)
+        {
+         robot.turnLeft();
+
+         leftCounter = 2;
+        } else if(leftCounter == 3)
+        {
+         robot.turnRight();
+
+         leftCounter = 2;
+        } else if(leftCounter == 0)
+        {
+         robot.turnRight();
+         robot.turnRight();
+
+         leftCounter = 2;
+        }
+      } else break;
 	}
 }
